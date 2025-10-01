@@ -1,0 +1,60 @@
+{
+  "scanner_bed": {
+    "width_mm": 215.9,
+    "height_mm": 297.0,
+    "comment": "Canon LiDE400 scanner bed dimensions (8.5\" x 11.7\")"
+  },
+  "photo_size": {
+    "width_mm": 88.9,
+    "height_mm": 107.95,
+    "width_inches": 3.5,
+    "height_inches": 4.25,
+    "comment": "Standard polaroid photo dimensions"
+  },
+  "scan_settings": {
+    "resolution": 1200,
+    "mode": "Color",
+    "format": "tiff",
+    "preview_mode": "off",
+    "comment": "High quality scan settings"
+  },
+  "layout": {
+    "margin_mm": 5,
+    "spacing_mm": 10,
+    "comment": "Margins and spacing between photos"
+  },
+  "positions": [
+    {
+      "id": 1,
+      "label": "Photo 1",
+      "left_mm": 14.65,
+      "top_mm": 17.51,
+      "width_mm": 91.44,
+      "height_mm": 110.49
+    },
+    {
+      "id": 2,
+      "label": "Photo 2",
+      "left_mm": 112.69,
+      "top_mm": 17.51,
+      "width_mm": 91.44,
+      "height_mm": 110.49
+    },
+    {
+      "id": 3,
+      "label": "Photo 3",
+      "left_mm": 14.65,
+      "top_mm": 134.51,
+      "width_mm": 91.44,
+      "height_mm": 110.49
+    },
+    {
+      "id": 4,
+      "label": "Photo 4",
+      "left_mm": 112.69,
+      "top_mm": 134.51,
+      "width_mm": 91.44,
+      "height_mm": 110.49
+    }
+  ]
+}
