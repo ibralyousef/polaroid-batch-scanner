@@ -14,12 +14,37 @@ import subprocess
 import tempfile
 import shutil
 import time
+import atexit
+import signal
 from pathlib import Path
 from datetime import datetime
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+
+# Global scanner state for cleanup
+_scanner = None
+_sane_initialized = False
+
+def cleanup_scanner():
+    """Ensure scanner resources are released on exit."""
+    global _scanner, _sane_initialized
+    if _scanner:
+        try:
+            _scanner.close()
+        except:
+            pass
+        _scanner = None
+    if _sane_initialized:
+        try:
+            sane.exit()
+        except:
+            pass
+        _sane_initialized = False
+
+atexit.register(cleanup_scanner)
+signal.signal(signal.SIGTERM, lambda *_: sys.exit(0))
 
 def play_completion_sound():
     """Play sound once, interruptible by Enter."""
@@ -257,8 +282,10 @@ def get_next_sequence(cartridge, destination_dir):
 
 def initialize_scanner():
     """Initialize SANE and detect Canon LiDE400 scanner."""
+    global _scanner, _sane_initialized
     print("Initializing SANE...")
     sane.init()
+    _sane_initialized = True
 
     devices = sane.get_devices()
     if not devices:
@@ -272,12 +299,13 @@ def initialize_scanner():
         print(f"  - {dev[0]}: {dev[1]} {dev[2]}")
 
     # Open the first available scanner with retry logic
-    max_retries = 3
+    max_retries = 6
     retry_delay = 2
 
     for attempt in range(max_retries):
         try:
             scanner = sane.open(devices[0][0])
+            _scanner = scanner
             print(f"\nOpened scanner: {devices[0][1]} {devices[0][2]}")
             return scanner
         except Exception as e:
@@ -398,7 +426,7 @@ def take_calibration_scan():
 
     try:
         # Retry logic for scanner access
-        max_retries = 3
+        max_retries = 6
         retry_delay = 2  # seconds
 
         for attempt in range(max_retries):
@@ -1198,7 +1226,7 @@ def show_preview_scan(config, positions):
 
     try:
         # Retry logic for scanner access
-        max_retries = 3
+        max_retries = 6
         retry_delay = 2  # seconds
 
         for attempt in range(max_retries):
@@ -1333,7 +1361,7 @@ def show_individual_previews(config, positions):
                 temp_files.append(tmp_path)
 
             # Retry logic for scanner access
-            max_retries = 3
+            max_retries = 6
             retry_delay = 2
 
             for attempt in range(max_retries):
@@ -1776,6 +1804,8 @@ def run_scanning():
                     print("\nClosing scanner for recalibration...")
                     scanner.close()
                     sane.exit()
+                    _scanner = None
+                    _sane_initialized = False
 
                     print("\n" + "="*60)
                     print("RECALIBRATION")
@@ -1852,6 +1882,8 @@ def run_scanning():
                     print("\nClosing scanner temporarily for preview...")
                     scanner.close()
                     sane.exit()
+                    _scanner = None
+                    _sane_initialized = False
 
                     # Determine which preview mode to use
                     current_preview_mode = settings.get('preview_mode', 'guide')
@@ -1895,6 +1927,8 @@ def run_scanning():
         # Cleanup
         scanner.close()
         sane.exit()
+        _scanner = None
+        _sane_initialized = False
 
     # Final summary
     print("\n" + "=" * 60)

@@ -153,7 +153,7 @@ sane-find-scanner
 Try different USB port, restart scanner.
 
 **"Access denied" or "Invalid argument"**
-Scanner busy from previous operation. System retries 3× automatically. If persistent: unplug/replug scanner.
+Scanner busy from previous operation. System retries 6× automatically. If persistent: unplug/replug scanner.
 
 **Wrong cartridge number suggested**
 Ensure all output folders are listed in `cartridge_prefixes.json`. System searches all folders for global max.
