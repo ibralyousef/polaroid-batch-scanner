@@ -16,6 +16,7 @@ import shutil
 import time
 import atexit
 import signal
+import select
 from pathlib import Path
 from datetime import datetime
 from PIL import Image
@@ -53,13 +54,12 @@ def play_completion_sound():
                             stdout=subprocess.DEVNULL,
                             stderr=subprocess.DEVNULL)
 
-    def wait_for_enter():
-        input()
-        proc.terminate()
-
-    thread = threading.Thread(target=wait_for_enter, daemon=True)
-    thread.start()
-    proc.wait()
+    # Wait for either Enter or sound to finish (main thread safe)
+    while proc.poll() is None:
+        if select.select([sys.stdin], [], [], 0.1)[0]:
+            sys.stdin.readline()
+            proc.terminate()
+            break
 
 # Configuration
 SCRIPT_DIR = Path(__file__).parent
