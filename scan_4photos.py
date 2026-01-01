@@ -9,6 +9,7 @@ import json
 import os
 import sys
 import re
+import threading
 import subprocess
 import tempfile
 import shutil
@@ -21,14 +22,19 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 def play_completion_sound():
-    """Play a sound to notify batch completion."""
-    try:
-        subprocess.run(
-            ["afplay", "/System/Library/Sounds/Glass.aiff"],
-            capture_output=True
-        )
-    except Exception:
-        pass  # Silently fail if sound can't play
+    """Play sound once, interruptible by Enter."""
+    sound_file = Path(__file__).parent / "samsung_washing_done.mp3"
+    proc = subprocess.Popen(["afplay", str(sound_file)],
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL)
+
+    def wait_for_enter():
+        input()
+        proc.terminate()
+
+    thread = threading.Thread(target=wait_for_enter, daemon=True)
+    thread.start()
+    proc.wait()
 
 # Configuration
 SCRIPT_DIR = Path(__file__).parent
