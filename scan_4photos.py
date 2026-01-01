@@ -20,6 +20,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
+def play_completion_sound():
+    """Play a sound to notify batch completion."""
+    try:
+        subprocess.run(
+            ["afplay", "/System/Library/Sounds/Glass.aiff"],
+            capture_output=True
+        )
+    except Exception:
+        pass  # Silently fail if sound can't play
+
 # Configuration
 SCRIPT_DIR = Path(__file__).parent
 CONFIG_FILE = SCRIPT_DIR / "config.json"
@@ -1736,6 +1746,7 @@ def run_scanning():
             # Summary for this batch
             print("-" * 60)
             print(f"Batch complete! {batch_success}/{len(positions)} photos scanned successfully.")
+            play_completion_sound()
 
             # Update sequence for next batch
             current_sequence += len(positions)
